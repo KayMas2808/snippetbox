@@ -17,6 +17,11 @@ type SnippetModel struct {
 	DB *sql.DB
 }
 
+// java equivalent-
+//
+//	class SnippetModel{
+//				public Snippet get(int id)
+//		}
 func (m *SnippetModel) Insert(title string, content string, expires int) (int, error) {
 	return 0, nil
 }

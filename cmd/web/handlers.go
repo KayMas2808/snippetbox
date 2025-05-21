@@ -14,10 +14,6 @@ import (
 // home handles requests to "/"
 // define a function as a func against the *application struct
 // like having a method inside a class in java -
-//
-//	class SnippetModel{
-//			public Snippet get(int id)
-//	}
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	// Makes it not act like a catch-all, and only work with URL "/"
 	if r.URL.Path != "/" {
