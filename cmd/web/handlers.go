@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"html/template"
-	"log"
 	"net/http"
 	"strconv"
 )
@@ -13,7 +12,8 @@ import (
 //
 
 // home handles requests to "/"
-func home(w http.ResponseWriter, r *http.Request) {
+// define a function as a func against the *application struct
+func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	// Makes it not act like a catch-all, and only work with URL "/"
 	if r.URL.Path != "/" {
 		http.NotFound(w, r)
@@ -21,7 +21,7 @@ func home(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Initialize a slice containing the paths to the two files. It's important
-	// to note that the file containing our base template must be the *first*
+	// to note that the file containing our base template must be the first
 	// file in the slice.
 	files := []string{
 		"./ui/html/base.tmpl.html",
@@ -35,7 +35,7 @@ func home(w http.ResponseWriter, r *http.Request) {
 	// response to the user.
 	ts, err := template.ParseFiles(files...)
 	if err != nil {
-		log.Println(err.Error())
+		app.errorLog.Println(err.Error())
 		http.Error(w, "Internal server error", 500)
 		return
 	}
@@ -50,7 +50,7 @@ func home(w http.ResponseWriter, r *http.Request) {
 	// which in turn invokes title and main templates
 	err = ts.ExecuteTemplate(w, "base", nil)
 	if err != nil {
-		log.Println(err.Error())
+		app.errorLog.Println(err.Error())
 		http.Error(w, "Internal server error", 500)
 	}
 }
@@ -87,5 +87,5 @@ func snippetCreate(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Cache-Control", "public, max-age=2000") // max seconds a response can be cached
-	w.Write([]byte("{'name':'alex'}"))
+	w.Write([]byte("{'name':'sam'}"))
 }
