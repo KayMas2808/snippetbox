@@ -56,7 +56,7 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 }
 
 // snippetView handles requests to "/snippet/view"
-func snippetView(w http.ResponseWriter, r *http.Request) {
+func (app *application) snippetView(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(r.URL.Query().Get("id")) // get id parameter from url
 	// and convert it to integer
 	if err != nil || id < 1 {
@@ -67,7 +67,7 @@ func snippetView(w http.ResponseWriter, r *http.Request) {
 }
 
 // snippetCreate handles POST requests to "/snippet/create"
-func snippetCreate(w http.ResponseWriter, r *http.Request) {
+func (app *application) snippetCreate(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		// .Set() function can set certain rules for the header, like the content type.
 		// If we don't specify the content type, Go calls http.DetectContentType() automatically.
