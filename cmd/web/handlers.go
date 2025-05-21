@@ -16,7 +16,7 @@ import (
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	// Makes it not act like a catch-all, and only work with URL "/"
 	if r.URL.Path != "/" {
-		http.NotFound(w, r)
+		app.notFound(w)
 		return
 	}
 
@@ -35,8 +35,7 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	// response to the user.
 	ts, err := template.ParseFiles(files...)
 	if err != nil {
-		app.errorLog.Println(err.Error())
-		http.Error(w, "Internal server error", 500)
+		app.serverError(w, err)
 		return
 	}
 
@@ -50,8 +49,7 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	// which in turn invokes title and main templates
 	err = ts.ExecuteTemplate(w, "base", nil)
 	if err != nil {
-		app.errorLog.Println(err.Error())
-		http.Error(w, "Internal server error", 500)
+		app.serverError(w, err)
 	}
 }
 
@@ -60,7 +58,7 @@ func (app *application) snippetView(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(r.URL.Query().Get("id")) // get id parameter from url
 	// and convert it to integer
 	if err != nil || id < 1 {
-		http.NotFound(w, r)
+		app.notFound(w)
 		return
 	}
 	fmt.Fprintf(w, "display snippets for id = %d", id)
@@ -82,7 +80,7 @@ func (app *application) snippetCreate(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusMethodNotAllowed) // using constant
 		// w.WriteHeader(405)                      // integer alternative
 
-		w.Write([]byte("Invalid http method. POST only allowed."))
+		app.clientError(w, http.StatusMethodNotAllowed)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
