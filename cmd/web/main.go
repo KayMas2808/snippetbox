@@ -3,19 +3,21 @@ package main
 import (
 	"database/sql"
 	"flag"
-	_ "github.com/go-sql-driver/mysql"
 	"log"
 	"net/http"
 	"os"
-	// _ means importing just for its side-effects
-	// means we can use its init without having to use its contents
-	// allows
+
+	"snippetbox.sam.net/internal/models"
+
+	_ "github.com/go-sql-driver/mysql"
+	// Import this package only for its side effects — specifically, to run its init() function.
 )
 
 // application struct to make loggers available in all files in this package
 type application struct {
 	errorLog *log.Logger
 	infoLog  *log.Logger
+	snippets *models.SnippetModel
 }
 
 //
@@ -27,7 +29,8 @@ func main() {
 	// command line flags, addr: default value of 8080, usage text telling what it does.
 	// could've been flag.Int, flag.Bool etc
 	addr := flag.String("addr", ":8080", "HTTP network address (default \":8080\")")
-	dsn := flag.String("dsn", "web:pass@/snipetbox?parseTime=true", "Data source")
+	//change acc to db pass, user, db name etc.
+	dsn := flag.String("dsn", "web:web@/snippetbox?parseTime=true", "Data source")
 
 	// parse the flag - reads it in command line and assigns value to addr.
 	// call this before using addr
@@ -51,6 +54,7 @@ func main() {
 	app := &application{
 		errorLog: errorLog,
 		infoLog:  infoLog,
+		snippets: &models.SnippetModel{DB: db},
 	}
 	// new http.Server struct to use our custom error logger for Go's http server
 	srv := &http.Server{
