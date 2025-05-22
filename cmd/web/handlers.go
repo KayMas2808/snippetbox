@@ -3,7 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
-	"html/template"
+	// "html/template"
 	"net/http"
 	"snippetbox.sam.net/internal/models"
 	"strconv"
@@ -23,24 +23,35 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	snippets, err := app.snippets.Latest()
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	for _, snippet := range snippets {
+		fmt.Fprintf(w, "%+v\n", snippet)
+	}
+
 	// Initialize a slice containing the paths to the two files. It's important
 	// to note that the file containing our base template must be the first
 	// file in the slice.
-	files := []string{
+
+	/*files := []string{
 		"./ui/html/base.tmpl.html",
 		"./ui/html/pages/home.tmpl.html",
 		"./ui/html/partials/nav.tmpl.html",
-	}
+	}*/
 
 	// Use the template.ParseFiles() function to read the template file into a
 	// template set. If there's an error, we log the detailed error message and use
 	// the http.Error() function to send a generic 500 Internal Server Error
 	// response to the user.
-	ts, err := template.ParseFiles(files...)
+
+	/*ts, err := template.ParseFiles(files...)
 	if err != nil {
 		app.serverError(w, err)
 		return
-	}
+	}*/
 
 	// We then used the Execute() method on the template set to write the
 	// template content as the response body. The last parameter to Execute()
@@ -50,10 +61,11 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	// template as the response body.
 	// execute template tell go that we want to respond using the base template
 	// which in turn invokes title and main templates
-	err = ts.ExecuteTemplate(w, "base", nil)
+
+	/*err = ts.ExecuteTemplate(w, "base", nil)
 	if err != nil {
 		app.serverError(w, err)
-	}
+	}*/
 }
 
 // snippetView handles requests to "/snippet/view"
