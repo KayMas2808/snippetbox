@@ -1,9 +1,11 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"html/template"
 	"net/http"
+	"snippetbox.sam.net/internal/models"
 	"strconv"
 )
 
@@ -13,7 +15,7 @@ import (
 
 // home handles requests to "/"
 // define a function as a func against the *application struct
-// like having a method inside a class in java -
+// like having a method inside a class in java - explained in snippets.go
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	// Makes it not act like a catch-all, and only work with URL "/"
 	if r.URL.Path != "/" {
@@ -62,7 +64,17 @@ func (app *application) snippetView(w http.ResponseWriter, r *http.Request) {
 		app.notFound(w)
 		return
 	}
-	fmt.Fprintf(w, "display snippets for id = %d", id)
+
+	snippet, err := app.snippets.Get(id)
+	if err != nil {
+		if errors.Is(err, models.ErrNoRecord) {
+			app.notFound(w)
+		} else {
+			app.serverError(w, err)
+		}
+		return
+	}
+	fmt.Fprintf(w, "%+v", snippet)
 }
 
 // snippetCreate handles POST requests to "/snippet/create"
@@ -84,7 +96,19 @@ func (app *application) snippetCreate(w http.ResponseWriter, r *http.Request) {
 		app.clientError(w, http.StatusMethodNotAllowed)
 		return
 	}
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Cache-Control", "public, max-age=2000") // max seconds a response can be cached
-	w.Write([]byte("{'name':'sam'}"))
+
+	//dummy data
+	title := "O snail"
+	content := "O snail\n Climb Mount Fuji,\n But slowly, slowly!,\n\n- Kobayashi Issa"
+	expires := 7
+
+	// passing data to SnippetModel.Insert(), getting id back
+	id, err := app.snippets.Insert(title, content, expires)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	// redirecting user to appropriate page.
+	http.Redirect(w, r, fmt.Sprintf("/snippet/view?id=%d", id), http.StatusSeeOther)
 }

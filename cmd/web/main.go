@@ -30,7 +30,7 @@ func main() {
 	// could've been flag.Int, flag.Bool etc
 	addr := flag.String("addr", ":8080", "HTTP network address (default \":8080\")")
 	//change acc to db pass, user, db name etc.
-	dsn := flag.String("dsn", "web:web@/snippetbox?parseTime=true", "Data source")
+	dsn := flag.String("dsn", "web:pass@/snipetbox?parseTime=true", "Data source")
 
 	// parse the flag - reads it in command line and assigns value to addr.
 	// call this before using addr
